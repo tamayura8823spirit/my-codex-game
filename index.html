@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>KAZUYA AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>KAZUYA AI</h1>
+  <canvas id="field" width="640" height="360"></canvas>
+  <div id="info">
+    <div>AI1 HP:<span id="hp1"></span> 状態:<span id="state1"></span></div>
+    <div>AI2 HP:<span id="hp2"></span> 状態:<span id="state2"></span></div>
+  </div>
+
+  <section id="config1" class="config">
+    <h2>AI1設定</h2>
+    <button class="random">ランダム生成</button>
+    <div class="rules"></div>
+    <button class="add-rule">ルール追加</button>
+  </section>
+
+  <section id="config2" class="config">
+    <h2>AI2設定</h2>
+    <button class="random">ランダム生成</button>
+    <div class="rules"></div>
+    <button class="add-rule">ルール追加</button>
+  </section>
+
+  <button id="start">戦闘開始</button>
+  <button id="rematch" style="display:none;">再戦</button>
+  <div id="result"></div>
+
+  <script type="module" src="js/script.js"></script>
+</body>
+</html>

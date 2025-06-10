@@ -1,0 +1,33 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 20px;
+}
+section {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+#field {
+  background: #eee;
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid #999;
+}
+.rule {
+  margin-bottom: 5px;
+}
+
+.param-label {
+  font-size: 0.8em;
+  color: #666;
+  margin-right: 8px;
+}
+select,
+input[type="number"] {
+  margin-right: 5px;
+}
+#info div {
+  margin-bottom: 5px;
+}
