@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>KAZUYA AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>KAZUYA AI</h1>
+
+  <section id="create-ai">
+    <h2>AI作成</h2>
+    <label>名前: <input type="text" id="ai-name"></label>
+    <div id="rules"></div>
+    <button id="add-rule">ルール追加</button>
+    <button id="register-ai">登録</button>
+  </section>
+
+  <section id="battle-setup">
+    <h2>対戦設定</h2>
+    <label>AI1: <select id="ai1"></select></label>
+    <label>AI2: <select id="ai2"></select></label>
+    <button id="start-battle">対戦開始</button>
+  </section>
+
+  <section id="battle">
+    <h2>バトル</h2>
+    <div id="battle-log"></div>
+  </section>
+
+  <script type="module" src="js/script.js"></script>
+</body>
+</html>
