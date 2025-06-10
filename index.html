@@ -7,26 +7,29 @@
 </head>
 <body>
   <h1>KAZUYA AI</h1>
+  <canvas id="field" width="640" height="360"></canvas>
+  <div id="info">
+    <div>AI1 HP:<span id="hp1"></span> 状態:<span id="state1"></span></div>
+    <div>AI2 HP:<span id="hp2"></span> 状態:<span id="state2"></span></div>
+  </div>
 
-  <section id="create-ai">
-    <h2>AI作成</h2>
-    <label>名前: <input type="text" id="ai-name"></label>
-    <div id="rules"></div>
-    <button id="add-rule">ルール追加</button>
-    <button id="register-ai">登録</button>
+  <section id="config1" class="config">
+    <h2>AI1設定</h2>
+    <button class="random">ランダム生成</button>
+    <div class="rules"></div>
+    <button class="add-rule">ルール追加</button>
   </section>
 
-  <section id="battle-setup">
-    <h2>対戦設定</h2>
-    <label>AI1: <select id="ai1"></select></label>
-    <label>AI2: <select id="ai2"></select></label>
-    <button id="start-battle">対戦開始</button>
+  <section id="config2" class="config">
+    <h2>AI2設定</h2>
+    <button class="random">ランダム生成</button>
+    <div class="rules"></div>
+    <button class="add-rule">ルール追加</button>
   </section>
 
-  <section id="battle">
-    <h2>バトル</h2>
-    <div id="battle-log"></div>
-  </section>
+  <button id="start">戦闘開始</button>
+  <button id="rematch" style="display:none;">再戦</button>
+  <div id="result"></div>
 
   <script type="module" src="js/script.js"></script>
 </body>

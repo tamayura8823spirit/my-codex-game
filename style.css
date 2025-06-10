@@ -9,11 +9,11 @@ section {
   padding: 10px;
   margin-bottom: 20px;
 }
-#battle-log {
+#field {
   background: #eee;
-  height: 200px;
-  overflow-y: auto;
-  padding: 10px;
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid #999;
 }
 .rule {
   margin-bottom: 5px;
@@ -21,4 +21,7 @@ section {
 select,
 input[type="number"] {
   margin-right: 5px;
+}
+#info div {
+  margin-bottom: 5px;
 }
