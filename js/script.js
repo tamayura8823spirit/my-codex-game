@@ -19,7 +19,10 @@ function createRuleRow(container, rule) {
   });
   const cParam = document.createElement('input');
   cParam.type = 'number';
-  cParam.value = rule ? rule.cParam : 30;
+
+  const cLabel = document.createElement('span');
+  cLabel.className = 'param-label';
+
   const aSelect = document.createElement('select');
   ACTIONS.forEach(a => {
     const opt = document.createElement('option');
@@ -29,15 +32,38 @@ function createRuleRow(container, rule) {
   });
   const aParam = document.createElement('input');
   aParam.type = 'number';
-  aParam.value = rule ? rule.aParam : 2;
+  const aLabel = document.createElement('span');
+  aLabel.className = 'param-label';
+  const remove = document.createElement('button');
+  remove.textContent = '削除';
+  remove.addEventListener('click', () => div.remove());
   if (rule) {
     cSelect.value = rule.condition;
     aSelect.value = rule.action;
+    cParam.value = rule.cParam;
+    aParam.value = rule.aParam;
   }
+
+  function refreshLabels() {
+    const cInfo = CONDITIONS.find(c => c.id === cSelect.value);
+    cLabel.textContent = cInfo ? cInfo.paramLabel : '';
+    cParam.placeholder = cLabel.textContent;
+    const aInfo = ACTIONS.find(a => a.id === aSelect.value);
+    aLabel.textContent = aInfo ? aInfo.paramLabel : '';
+    aParam.placeholder = aLabel.textContent;
+  }
+  cSelect.addEventListener('change', refreshLabels);
+  aSelect.addEventListener('change', refreshLabels);
+  refreshLabels();
+
   div.appendChild(cSelect);
   div.appendChild(cParam);
+  div.appendChild(cLabel);
   div.appendChild(aSelect);
   div.appendChild(aParam);
+  div.appendChild(aLabel);
+  div.appendChild(remove);
+
   container.appendChild(div);
 }
 
@@ -63,7 +89,9 @@ setupSection(document.getElementById('config2'));
 
 function getAI(section, name) {
   const rules = Array.from(section.querySelectorAll('.rule')).map(div => {
-    const [cSelect, cParam, aSelect, aParam] = div.children;
+
+    const [cSelect, cParam, , aSelect, aParam] = div.children;
+
     return {
       condition: cSelect.value,
       cParam: Number(cParam.value),
@@ -89,6 +117,10 @@ class Player {
     this.lastShot = 0;
     this.lastHit = 0;
     this.state = 'idle';
+
+    this.freezeUntil = 0;
+    this.nextWander = 0;
+
   }
   update(dt, enemy, bullets, now) {
     for (const r of this.rules) {
@@ -97,6 +129,20 @@ class Player {
         break;
       }
     }
+
+    if (now < this.freezeUntil) {
+      this.vx = 0;
+      this.vy = 0;
+    } else if (this.state !== 'idle') {
+      this.state = 'idle';
+    } else if (now > this.nextWander) {
+      const ang = Math.random() * Math.PI * 2;
+      this.vx = Math.cos(ang) * 1.5;
+      this.vy = Math.sin(ang) * 1.5;
+      this.nextWander = now + 1000 + Math.random() * 1000;
+    }
+
+
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     const half = this.size / 2;
@@ -111,16 +157,19 @@ class Player {
 
 function checkCondition(condId, param, self, enemy, now) {
   switch (condId) {
-    case 'enemy_near':
+
+    case 'enemy_hp_lt':
+      return enemy.hp < param;
+    case 'enemy_near': {
       const dx = self.x - enemy.x;
       const dy = self.y - enemy.y;
       return Math.hypot(dx, dy) < param;
-    case 'hp_lt':
+    }
+    case 'self_hp_lt':
       return self.hp < param;
-    case 'not_hit':
-      return now - self.lastHit > 1000;
-    case 'enemy_attacking':
-      return enemy.state === 'shoot';
+    case 'recent_hit':
+      return now - self.lastHit <= param;
+
     default:
       return false;
   }
@@ -141,25 +190,49 @@ function performAction(actId, param, self, enemy, bullets, now) {
         });
         self.lastShot = now;
         self.state = 'shoot';
+
+        self.freezeUntil = now + 300;
       }
       break;
-    case 'evade':
-      const angle2 = Math.random() * Math.PI * 2;
-      self.vx = Math.cos(angle2) * (param || 2);
-      self.vy = Math.sin(angle2) * (param || 2);
-      self.state = 'evade';
+    case 'melee': {
+      const dist = Math.hypot(self.x - enemy.x, self.y - enemy.y);
+      if (dist < 30) {
+        enemy.hp -= param || 15;
+        if (enemy.hp < 0) enemy.hp = 0;
+        enemy.lastHit = now;
+      }
+      self.state = 'melee';
+      self.freezeUntil = now + 300;
       break;
-    case 'advance':
-      const angle3 = Math.atan2(enemy.y - self.y, enemy.x - self.x);
-      self.vx = Math.cos(angle3) * (param || 2);
-      self.vy = Math.sin(angle3) * (param || 2);
-      self.state = 'advance';
+    }
+    case 'approach': {
+      const angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
+      self.vx = Math.cos(angle) * (param || 2);
+      self.vy = Math.sin(angle) * (param || 2);
+      self.state = 'approach';
       break;
-    case 'stop':
+    }
+    case 'retreat': {
+      const angle = Math.atan2(self.y - enemy.y, self.x - enemy.x);
+      self.vx = Math.cos(angle) * (param || 2);
+      self.vy = Math.sin(angle) * (param || 2);
+      self.state = 'retreat';
+      break;
+    }
+    case 'wait':
       self.vx = 0;
       self.vy = 0;
-      self.state = 'stop';
+      self.state = 'wait';
+      self.freezeUntil = now + (param || 500);
       break;
+    case 'random': {
+      const ang = Math.random() * Math.PI * 2;
+      self.vx = Math.cos(ang) * (param || 2);
+      self.vy = Math.sin(ang) * (param || 2);
+      self.state = 'random';
+      break;
+    }
+
   }
 }
 
