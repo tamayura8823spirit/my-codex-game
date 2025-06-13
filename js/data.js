@@ -1,4 +1,5 @@
 export const CONDITIONS = [
+
   { id: 'enemy_hp_lt', name: '敵のHP <', paramLabel: 'HP値' },
   { id: 'enemy_near', name: '敵との距離 <', paramLabel: '距離(px)' },
   { id: 'self_hp_lt', name: '自分のHP <', paramLabel: 'HP値' },
@@ -17,6 +18,7 @@ export const ACTIONS = [
 function randomRule() {
   const c = CONDITIONS[Math.floor(Math.random() * CONDITIONS.length)];
   const a = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+
   const cParam = c.id === 'recent_hit' ? 1000 : Math.floor(Math.random() * 50) + 20;
   const aParam = a.id === 'shoot' ? 6 : a.id === 'melee' ? 15 : 2;
   return { condition: c.id, cParam, action: a.id, aParam };

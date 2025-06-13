@@ -19,8 +19,10 @@ function createRuleRow(container, rule) {
   });
   const cParam = document.createElement('input');
   cParam.type = 'number';
+
   const cLabel = document.createElement('span');
   cLabel.className = 'param-label';
+
   const aSelect = document.createElement('select');
   ACTIONS.forEach(a => {
     const opt = document.createElement('option');
@@ -61,6 +63,7 @@ function createRuleRow(container, rule) {
   div.appendChild(aParam);
   div.appendChild(aLabel);
   div.appendChild(remove);
+
   container.appendChild(div);
 }
 
@@ -86,7 +89,9 @@ setupSection(document.getElementById('config2'));
 
 function getAI(section, name) {
   const rules = Array.from(section.querySelectorAll('.rule')).map(div => {
+
     const [cSelect, cParam, , aSelect, aParam] = div.children;
+
     return {
       condition: cSelect.value,
       cParam: Number(cParam.value),
@@ -112,8 +117,10 @@ class Player {
     this.lastShot = 0;
     this.lastHit = 0;
     this.state = 'idle';
+
     this.freezeUntil = 0;
     this.nextWander = 0;
+
   }
   update(dt, enemy, bullets, now) {
     for (const r of this.rules) {
@@ -122,6 +129,7 @@ class Player {
         break;
       }
     }
+
     if (now < this.freezeUntil) {
       this.vx = 0;
       this.vy = 0;
@@ -133,6 +141,7 @@ class Player {
       this.vy = Math.sin(ang) * 1.5;
       this.nextWander = now + 1000 + Math.random() * 1000;
     }
+
 
     this.x += this.vx * dt;
     this.y += this.vy * dt;
@@ -148,6 +157,7 @@ class Player {
 
 function checkCondition(condId, param, self, enemy, now) {
   switch (condId) {
+
     case 'enemy_hp_lt':
       return enemy.hp < param;
     case 'enemy_near': {
@@ -159,6 +169,7 @@ function checkCondition(condId, param, self, enemy, now) {
       return self.hp < param;
     case 'recent_hit':
       return now - self.lastHit <= param;
+
     default:
       return false;
   }
@@ -179,6 +190,7 @@ function performAction(actId, param, self, enemy, bullets, now) {
         });
         self.lastShot = now;
         self.state = 'shoot';
+
         self.freezeUntil = now + 300;
       }
       break;
@@ -220,6 +232,7 @@ function performAction(actId, param, self, enemy, bullets, now) {
       self.state = 'random';
       break;
     }
+
   }
 }
 
