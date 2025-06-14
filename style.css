@@ -15,6 +15,10 @@ section {
   margin-bottom: 10px;
   border: 1px solid #999;
 }
+#options {
+  margin-bottom: 10px;
+}
+
 .rule {
   margin-bottom: 5px;
 }

@@ -8,6 +8,12 @@
 <body>
   <h1>KAZUYA AI</h1>
   <canvas id="field" width="640" height="360"></canvas>
+  <div id="options">
+    <label><input type="checkbox" id="inertia">慣性移動</label>
+    <label><input type="checkbox" id="keep1">AI1距離維持</label>
+    <label><input type="checkbox" id="keep2">AI2距離維持</label>
+  </div>
+
   <div id="info">
     <div>AI1 HP:<span id="hp1"></span> 状態:<span id="state1"></span></div>
     <div>AI2 HP:<span id="hp2"></span> 状態:<span id="state2"></span></div>
