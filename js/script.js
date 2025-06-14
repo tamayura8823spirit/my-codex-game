@@ -109,50 +109,15 @@ function setupSection(section) {
 setupSection(document.getElementById('config1'));
 setupSection(document.getElementById('config2'));
 
-    this.lastDecision = 0;
-    this.moveEnd = 0;
-    this.waitUntil = 0;
-      maintainRange(this, enemy, now);
-    if (this.x < half || this.x > canvas.width - half) this.vx *= -1;
-    if (this.y < half || this.y > canvas.height - half) this.vy *= -1;
-function maintainRange(self, enemy, now) {
-  if (now < self.moveEnd) {
-    self.state = 'keep_range';
-    return;
-  }
-  if (now < self.waitUntil) {
-    self.vx = 0;
-    self.vy = 0;
-    self.state = 'wait';
-    return;
-  }
+function getAI(section, name) {
+  const rules = Array.from(section.querySelectorAll('.rule')).map(div => div.getValues());
+  return { name, rules };
+}
 
-  if (now - self.lastDecision < 1000) {
-    return;
-  }
+class Player {
+  constructor(name, rules, color, x, y) {
+    this.name = name;
 
-  self.lastDecision = now;
-  let angle = Math.atan2(dy, dx);
-    angle += Math.PI; // retreat
-  } else if (dist > 160) {
-    // approach, angle stays
-    const r = Math.random();
-    if (r < 0.4) angle += Math.PI / 2; // strafe left
-    else if (r < 0.8) angle -= Math.PI / 2; // strafe right
-    else {
-      self.vx = 0;
-      self.vy = 0;
-      self.state = 'wait';
-      self.moveEnd = now;
-      self.waitUntil = now + 500;
-      return;
-    }
-  angle += (Math.random() - 0.5) * 0.4;
-  const speed = 2 + Math.random();
-  self.vx = Math.cos(angle) * speed;
-  self.vy = Math.sin(angle) * speed;
-  self.moveEnd = now + 500;
-  self.waitUntil = self.moveEnd + 500;
     this.rules = rules;
     this.color = color;
     this.x = x;
@@ -172,6 +137,10 @@ function maintainRange(self, enemy, now) {
     this.state = 'idle';
     this.freezeUntil = 0;
     this.keepRange = false;
+    this.lastDecision = 0;
+    this.moveEnd = 0;
+    this.waitUntil = 0;
+
   }
   update(dt, enemy, bullets, now) {
     for (const r of this.rules) {
@@ -184,7 +153,8 @@ function maintainRange(self, enemy, now) {
       this.vx = 0;
       this.vy = 0;
     } else if (this.keepRange) {
-      maintainRange(this, enemy);
+      maintainRange(this, enemy, now);
+
     } else {
       this.vx *= inertiaCheckbox.checked ? 0.9 : 0;
       this.vy *= inertiaCheckbox.checked ? 0.9 : 0;
@@ -193,10 +163,12 @@ function maintainRange(self, enemy, now) {
       }
     }
 
-
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     const half = this.size / 2;
+    if (this.x < half || this.x > canvas.width - half) this.vx *= -1;
+    if (this.y < half || this.y > canvas.height - half) this.vy *= -1;
+
     this.x = Math.max(half, Math.min(canvas.width - half, this.x));
     this.y = Math.max(half, Math.min(canvas.height - half, this.y));
   }
@@ -222,21 +194,52 @@ function maintainRange(self, enemy, now) {
   }
 }
 
-function maintainRange(self, enemy) {
+function maintainRange(self, enemy, now) {
+  if (now < self.moveEnd) {
+    self.state = 'keep_range';
+    return;
+  }
+  if (now < self.waitUntil) {
+    self.vx = 0;
+    self.vy = 0;
+    self.state = 'wait';
+    return;
+  }
+
+  if (now - self.lastDecision < 1000) {
+    return;
+  }
+
+  self.lastDecision = now;
   const dx = enemy.x - self.x;
   const dy = enemy.y - self.y;
   const dist = Math.hypot(dx, dy);
-  let angle;
+  let angle = Math.atan2(dy, dx);
   if (dist < 100) {
-    angle = Math.atan2(self.y - enemy.y, self.x - enemy.x);
-  } else if (dist > 150) {
-    angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
+    angle += Math.PI; // retreat
+  } else if (dist > 160) {
+    // approach, angle stays
   } else {
-    angle = Math.atan2(enemy.y - self.y, enemy.x - self.x) + Math.PI / 2;
+    const r = Math.random();
+    if (r < 0.4) angle += Math.PI / 2; // strafe left
+    else if (r < 0.8) angle -= Math.PI / 2; // strafe right
+    else {
+      self.vx = 0;
+      self.vy = 0;
+      self.state = 'wait';
+      self.moveEnd = now;
+      self.waitUntil = now + 500;
+      return;
+    }
   }
-  self.vx = Math.cos(angle) * 2;
-  self.vy = Math.sin(angle) * 2;
+  angle += (Math.random() - 0.5) * 0.4;
+  const speed = 2 + Math.random();
+  self.vx = Math.cos(angle) * speed;
+  self.vy = Math.sin(angle) * speed;
   self.state = 'keep_range';
+  self.moveEnd = now + 500;
+  self.waitUntil = self.moveEnd + 500;
+
 }
 
 function checkCondition(condId, params, self, enemy, now) {
