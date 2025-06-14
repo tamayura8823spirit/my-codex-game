@@ -8,6 +8,7 @@ const state1Span = document.getElementById('state1');
 const state2Span = document.getElementById('state2');
 const inertiaCheckbox = document.getElementById('inertia');
 
+
 function createRuleRow(container, rule) {
   const div = document.createElement('div');
   div.className = 'rule';
@@ -19,6 +20,7 @@ function createRuleRow(container, rule) {
     cSelect.appendChild(opt);
   });
   const cParamWrap = document.createElement('span');
+
   const aSelect = document.createElement('select');
   ACTIONS.forEach(a => {
     const opt = document.createElement('option');
@@ -83,6 +85,7 @@ function createRuleRow(container, rule) {
     aParams: aInputs.map(i => Number(i.value))
   });
 
+
   container.appendChild(div);
 }
 
@@ -114,6 +117,7 @@ function getAI(section, name) {
 class Player {
   constructor(name, rules, color, x, y) {
     this.name = name;
+
     this.rules = rules;
     this.color = color;
     this.x = x;
@@ -136,6 +140,7 @@ class Player {
     this.lastDecision = 0;
     this.moveEnd = 0;
     this.waitUntil = 0;
+
   }
   update(dt, enemy, bullets, now) {
     for (const r of this.rules) {
@@ -149,6 +154,7 @@ class Player {
       this.vy = 0;
     } else if (this.keepRange) {
       maintainRange(this, enemy, now);
+
     } else {
       this.vx *= inertiaCheckbox.checked ? 0.9 : 0;
       this.vy *= inertiaCheckbox.checked ? 0.9 : 0;
@@ -162,6 +168,7 @@ class Player {
     const half = this.size / 2;
     if (this.x < half || this.x > canvas.width - half) this.vx *= -1;
     if (this.y < half || this.y > canvas.height - half) this.vy *= -1;
+
     this.x = Math.max(half, Math.min(canvas.width - half, this.x));
     this.y = Math.max(half, Math.min(canvas.height - half, this.y));
   }
@@ -232,6 +239,7 @@ function maintainRange(self, enemy, now) {
   self.state = 'keep_range';
   self.moveEnd = now + 500;
   self.waitUntil = self.moveEnd + 500;
+
 }
 
 function checkCondition(condId, params, self, enemy, now) {
@@ -257,6 +265,7 @@ function checkCondition(condId, params, self, enemy, now) {
       return true;
     case 'random_cond':
       return Math.random() < 0.5;
+
     default:
       return false;
   }
@@ -268,17 +277,20 @@ function performAction(actId, params, self, enemy, bullets, now) {
   switch (actId) {
     case 'shoot':
       if (now - self.lastShot > (p1 || 800)) {
+
         const angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
         bullets.push({
           x: self.x,
           y: self.y,
           vx: Math.cos(angle) * (p0 || 4),
           vy: Math.sin(angle) * (p0 || 4),
+
           owner: self,
           damage: 5
         });
         self.lastShot = now;
         self.state = 'shoot';
+
         self.freezeUntil = now + 300;
       }
       break;
@@ -294,6 +306,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
         }
         self.lastMelee = now;
         self.meleeShowUntil = now + 200;
+
       }
       self.state = 'melee';
       self.freezeUntil = now + 300;
@@ -303,6 +316,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
       const angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
       self.vx = Math.cos(angle) * (p0 || 2);
       self.vy = Math.sin(angle) * (p0 || 2);
+
       self.state = 'approach';
       break;
     }
@@ -310,6 +324,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
       const angle = Math.atan2(self.y - enemy.y, self.x - enemy.x);
       self.vx = Math.cos(angle) * (p0 || 2);
       self.vy = Math.sin(angle) * (p0 || 2);
+
       self.state = 'retreat';
       break;
     }
@@ -400,6 +415,7 @@ function updateBullets(dt, now) {
         if (target.hp < 0) target.hp = 0;
         target.lastHit = now;
       }
+
       bullets.splice(i, 1);
     }
   }
@@ -417,6 +433,7 @@ function loop(timestamp) {
   updateBullets(dt, now);
   p1.draw(ctx, now);
   p2.draw(ctx, now);
+
   bullets.forEach(b => {
     ctx.beginPath();
     ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
@@ -447,6 +464,7 @@ function start() {
   p2 = new Player('AI2', ai2.rules, 'blue', canvas.width - 80, canvas.height / 2);
   p1.keepRange = document.getElementById('keep1').checked;
   p2.keepRange = document.getElementById('keep2').checked;
+
   running = true;
   lastTimestamp = 0;
   requestAnimationFrame(loop);
