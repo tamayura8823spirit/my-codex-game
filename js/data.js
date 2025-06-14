@@ -21,6 +21,7 @@ export const ACTIONS = [
   { id: 'move_right', name: '敵から見て右へ移動', paramLabels: ['距離(px)', '速度'] },
   { id: 'heal', name: '回復', paramLabels: ['回復量', 'クールダウン(ms)'] },
   { id: 'guard', name: 'ガード', paramLabels: ['持続ms', 'クールダウン(ms)'] }
+
 ];
 
 function randomRule() {
@@ -29,6 +30,7 @@ function randomRule() {
   const cParams = c.paramLabels.map(() => Math.floor(Math.random() * 50) + 20);
   const aParams = a.paramLabels.map(() => 5);
   return { condition: c.id, cParams, action: a.id, aParams };
+
 }
 
 export function generateRandomRules() {

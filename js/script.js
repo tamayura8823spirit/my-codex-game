@@ -8,6 +8,7 @@ const state1Span = document.getElementById('state1');
 const state2Span = document.getElementById('state2');
 const inertiaCheckbox = document.getElementById('inertia');
 
+
 function createRuleRow(container, rule) {
   const div = document.createElement('div');
   div.className = 'rule';
@@ -19,6 +20,7 @@ function createRuleRow(container, rule) {
     cSelect.appendChild(opt);
   });
   const cParamWrap = document.createElement('span');
+
   const aSelect = document.createElement('select');
   ACTIONS.forEach(a => {
     const opt = document.createElement('option');
@@ -83,6 +85,7 @@ function createRuleRow(container, rule) {
     aParams: aInputs.map(i => Number(i.value))
   });
 
+
   container.appendChild(div);
 }
 
@@ -108,6 +111,7 @@ setupSection(document.getElementById('config2'));
 
 function getAI(section, name) {
   const rules = Array.from(section.querySelectorAll('.rule')).map(div => div.getValues());
+
   return { name, rules };
 }
 
@@ -153,6 +157,7 @@ class Player {
         this.state = 'idle';
       }
     }
+
 
     this.x += this.vx * dt;
     this.y += this.vy * dt;
@@ -222,6 +227,7 @@ function checkCondition(condId, params, self, enemy, now) {
       return true;
     case 'random_cond':
       return Math.random() < 0.5;
+
     default:
       return false;
   }
@@ -233,17 +239,20 @@ function performAction(actId, params, self, enemy, bullets, now) {
   switch (actId) {
     case 'shoot':
       if (now - self.lastShot > (p1 || 800)) {
+
         const angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
         bullets.push({
           x: self.x,
           y: self.y,
           vx: Math.cos(angle) * (p0 || 4),
           vy: Math.sin(angle) * (p0 || 4),
+
           owner: self,
           damage: 5
         });
         self.lastShot = now;
         self.state = 'shoot';
+
         self.freezeUntil = now + 300;
       }
       break;
@@ -259,6 +268,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
         }
         self.lastMelee = now;
         self.meleeShowUntil = now + 200;
+
       }
       self.state = 'melee';
       self.freezeUntil = now + 300;
@@ -268,6 +278,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
       const angle = Math.atan2(enemy.y - self.y, enemy.x - self.x);
       self.vx = Math.cos(angle) * (p0 || 2);
       self.vy = Math.sin(angle) * (p0 || 2);
+
       self.state = 'approach';
       break;
     }
@@ -275,6 +286,7 @@ function performAction(actId, params, self, enemy, bullets, now) {
       const angle = Math.atan2(self.y - enemy.y, self.x - enemy.x);
       self.vx = Math.cos(angle) * (p0 || 2);
       self.vy = Math.sin(angle) * (p0 || 2);
+
       self.state = 'retreat';
       break;
     }
@@ -365,6 +377,7 @@ function updateBullets(dt, now) {
         if (target.hp < 0) target.hp = 0;
         target.lastHit = now;
       }
+
       bullets.splice(i, 1);
     }
   }
@@ -382,6 +395,7 @@ function loop(timestamp) {
   updateBullets(dt, now);
   p1.draw(ctx, now);
   p2.draw(ctx, now);
+
   bullets.forEach(b => {
     ctx.beginPath();
     ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
@@ -412,6 +426,7 @@ function start() {
   p2 = new Player('AI2', ai2.rules, 'blue', canvas.width - 80, canvas.height / 2);
   p1.keepRange = document.getElementById('keep1').checked;
   p2.keepRange = document.getElementById('keep2').checked;
+
   running = true;
   lastTimestamp = 0;
   requestAnimationFrame(loop);
